@@ -51,6 +51,14 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:600;\">PHẦN MỀM CHỈNH SỬA BẢNG GIÁ TỰ ĐỘNG</span></p></body></html>"))
         self.label_2.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:6pt;\">Bản quyền Gia Bao</span></p></body></html>"))
 
+    def showMessageBox(self, title, message):
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.setIcon(QtWidgets.QMessageBox.Icon.Information)  # Set icon to Information
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)  # OK button
+        msg_box.exec()
+
     def updatePrice(self):
         file_path = 'C:/Users/Admin/Downloads/ketqua_combined.xlsx'
         df = pd.read_excel(file_path)
@@ -90,10 +98,10 @@ class Ui_MainWindow(object):
                 if exists > 0:
                     sql_update_query = """
                     UPDATE Phantichgia_state1
-                    SET GIA = ?
+                    SET GIA = ?, dvt = ?
                     WHERE Macn = ? AND Mahang = ? AND Loai = ?
                     """
-                    values = (row['GIA'], str(row['Macn']), row['Mahang'], row['Loai'])
+                    values = (row['GIA'], row['dvt'], str(row['Macn']), row['Mahang'], row['Loai'])
                     try:
                         cursor.execute(sql_update_query, values)
                     except pyodbc.Error as update_error:
@@ -101,15 +109,15 @@ class Ui_MainWindow(object):
                         continue
 
             conn.commit()
+            self.showMessageBox("Cập nhật thành công", "Dữ liệu đã được cập nhật thành công!")
 
         except pyodbc.Error as e:
             print(f"Error occurred: {e}")
+            self.showMessageBox("Lỗi", "Đã xảy ra lỗi khi cập nhật dữ liệu.")
 
         finally:
             cursor.close()
             conn.close()
-
-        print("Cập nhật dữ liệu thành công!")
 
     def addPrice(self):
         file_path = 'C:/Users/Admin/Downloads/ketqua_combined.xlsx'
@@ -128,6 +136,7 @@ class Ui_MainWindow(object):
             df['GIA'] = pd.to_numeric(df['GIA'], errors='coerce').astype('Int64')
         except ValueError as e:
             print(f"Error converting 'GIA' column to numeric: {e}")
+            self.showMessageBox("Lỗi", "Đã xảy ra lỗi khi chuyển đổi cột 'GIA'.")
             return
 
         conn_str = (
@@ -162,19 +171,20 @@ class Ui_MainWindow(object):
                     cursor.execute(sql_insert_query, values)
 
             conn.commit()
+            self.showMessageBox("Thêm thành công", "Dữ liệu đã được thêm thành công!")
 
         except pyodbc.Error as e:
             print(f"Error occurred: {e}")
+            self.showMessageBox("Lỗi", "Đã xảy ra lỗi khi thêm dữ liệu.")
 
         finally:
             cursor.close()
             conn.close()
 
-        print("Thêm giá bán thành công!")
-
     def deletePrice(self):
-        # Đoạn mã thực hiện xóa giá bán
-        print("Xóa giá bán được nhấn")
+        # Cần implement phương thức xóa giá bán tương tự như updatePrice và addPrice
+        pass
+
 
 if __name__ == "__main__":
     import sys

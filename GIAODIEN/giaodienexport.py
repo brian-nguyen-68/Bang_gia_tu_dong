@@ -64,21 +64,21 @@ class Ui_MainWindow(object):
         conn = pyodbc.connect(conn_str)
 
         # Đọc dữ liệu từ bảng
-        query = "SELECT * FROM Phantichgia_state1"
+        query = "SELECT * FROM file_pushgia1"
         df = pd.read_sql(query, conn)
 
         # Đóng kết nối
         conn.close()
 
-        # Lấy danh sách các mã chi nhánh
-        branch_codes = df['Macn'].unique()
+        # Lấy danh sách các tên chi nhánh
+        name_codes = df['Ten Chi Nhanh'].unique()
 
-        for branch_code in branch_codes:
+        for name_code in name_codes:
             # Lọc dữ liệu theo mã chi nhánh
-            branch_df = df[df['Macn'] == branch_code]
+            branch_df = df[df['Ten Chi Nhanh'] == name_code]
 
             # Đặt tên file dựa trên mã chi nhánh
-            file_name = f'{branch_code}.xlsx'
+            file_name = f'{name_codes}_2024.xlsx'
 
             # Tạo đường dẫn đầy đủ tới file
             file_path = os.path.join(output_directory, file_name)
@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
             # Xuất dữ liệu ra file Excel
             branch_df.to_excel(file_path, index=False, engine='openpyxl')
 
-            print(f'Data for branch code {branch_code} exported to {file_path}')
+            print(f'Data for branch code {name_code} exported to {file_path}')
 
         self.show_message("Thông báo", "Dữ liệu đã được xuất thành công.")
 
